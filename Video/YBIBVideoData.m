@@ -83,6 +83,23 @@ extern CGImageRef YYCGImageCreateDecodedCopy(CGImageRef imageRef, BOOL decodeFor
     } else if (self.projectiveView && [self.projectiveView isKindOfClass:UIImageView.self] && ((UIImageView *)self.projectiveView).image) {
         self.thumbImage = ((UIImageView *)self.projectiveView).image;
         [self.delegate yb_videoData:self readyForThumbImage:self.thumbImage];
+    } else if (self.thumbURL) {
+        //若预览URL存在
+        __weak typeof(self) wSelf = self;
+        //异步请求网络图片数据
+        YBIB_DISPATCH_ASYNC(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            UIImage *resultImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:wSelf.thumbURL]];
+            YBIB_DISPATCH_ASYNC_MAIN(^{
+                __strong typeof(wSelf) self = wSelf;
+                if (!self) return;
+                //不加载视频首帧
+                self.loadingFirstFrame = NO;
+                //赋值图片给全局属性
+                self.thumbImage = resultImage;
+                //告知代理对象图片已经准备完毕
+                [self.delegate yb_videoData:self readyForThumbImage:self.thumbImage];
+            })
+        })
     } else {
         [self loadThumbImage_firstFrame];
     }

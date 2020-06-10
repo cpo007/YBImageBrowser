@@ -38,6 +38,9 @@ typedef void (^YBIBVideoSingleTouchBlock)(YBIBVideoData *videoData);
 /// 预览图/缩约图，若 projectiveView 存在且是 UIImageView 类型将会自动获取缩约图
 @property (nonatomic, strong, nullable) UIImage *thumbImage;
 
+/// 20200609预览URL，新增当不存在预览图时，使用外部传入的URL地址进行预览图加载
+@property (nonatomic, strong, nullable) NSURL *thumbURL;
+
 /// 是否允许保存到相册
 @property (nonatomic, assign) BOOL allowSaveToPhotoAlbum;
 
